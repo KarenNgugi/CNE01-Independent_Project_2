@@ -1,1 +1,1 @@
-# CNE01-Independent_Project_2
+# CNE Independent Project 2 - Containerization
