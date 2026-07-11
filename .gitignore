@@ -1,1 +1,13 @@
+# git files
 .git
+
+# environment variable files
+.env
+.env*
+
+# node modules folder
+*/node_modules/*
+
+# OS / editor
+.DS_Store
+.vscode/*.log
