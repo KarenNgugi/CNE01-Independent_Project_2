@@ -6,7 +6,7 @@
 .env*
 
 # node modules folder
-*/node_modules/*
+**/node_modules/
 
 # OS / editor
 .DS_Store
