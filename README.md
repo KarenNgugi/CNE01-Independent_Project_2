@@ -1,4 +1,4 @@
-# CNE Independent Project 2 - Containerization
+ # CNE Independent Project 2 - Containerization
 
 ## Project Overview
 The project sets up a Student Grade Tracker — a 3-tier web application that allows students to be added, grades to be recorded, and results to be viewed.
@@ -207,6 +207,19 @@ docker run \
 You can now access the site on your browser via **`http://localhost`**
 #### 3.4. Running with Docker Compose
 ```
+# install docker compose (Ubuntu/Debian)
+sudo apt-get update
+sudo apt-get install docker-compose-plugin -y
+
+# start docker compose
+docker compose up -d
+```
+
+Give the app time to start up, then access it through **`http://localhost`**
+
+When you are ready to take the app down, run the following:
+```
+docker compose down -v
 ```
 
 ## Lessons Learned
