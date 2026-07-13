@@ -1,0 +1,45 @@
+name: grades-tracker-app
+
+services:
+  tracker-frontend:
+    build: ./frontend/
+    ports:
+      - 80:80
+    volumes:
+      - type: bind
+        source: ./frontend/grades-tracker.conf
+        target: /etc/nginx/conf.d/default.conf
+        read_only: true
+    networks:
+      - tracker-network
+    depends_on:
+      - tracker-backend
+
+  tracker-backend:
+    build: ./backend/
+    environment:
+      DB_HOST: tracker-db
+      DB_PORT: 5432
+      DB_USER: postgres
+      DB_PASSWORD: password
+      DB_NAME: grades_db
+    networks:
+      - tracker-network
+    depends_on:
+      - tracker-db
+  
+  tracker-db:
+    image: postgres:17
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: password
+      POSTGRES_DB: grades_db
+    volumes:
+      - ./database/:/docker-entrypoint-initdb.d/
+    networks:
+      - tracker-network
+
+networks:
+  tracker-network:
+    driver: bridge
+
