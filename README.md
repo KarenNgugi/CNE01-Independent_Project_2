@@ -99,6 +99,10 @@ Database connection established
 Grade Tracker API running on port 3000
 ```
 
+The following endpoints can be accessed:
+* **`/api/students:`** returns JSON of current students in the database
+* **`/api/grades:`** returns JSON of grades per students
+
 #### 2.3. Nginx (frontend)
 Before starting on Nginx, first confirm the initial set up is ok:
 ```
@@ -143,5 +147,70 @@ Run `sudo nginx -t` again to confirm configuration test is OK then run `sudo sys
 Confirm your site is up and running on `http://localhost:80`.
 
 ### 3. Docker Installation
+Install the Docker engine as per the instructions in [the official documentstion](https://docs.docker.com/engine/install/).
 
+#### 3.1. Running the database container
+```
+# create dedicated network
+docker network create tracker-network
 
+# navigate to the database directory
+cd database
+
+# run docker command to create container using existing postgres:17 image
+docker run \ 
+    --name tracker-db \ 
+    -e POSTGRES_USER=postgres \ 
+    -e POSTGRES_PASSWORD=password \ 
+    -e POSTGRES_DB=grades_db \ 
+    --network tracker-network \ 
+    -v ./init.sql:/docker-entrypoint-initdb.d/init.sql \ 
+    -d postgres:17
+```
+
+#### 3.2. Running the backend container
+```
+# navigate to the backend directory
+cd ../backend
+
+# build image from Dockerfile
+docker build -t tracker-backend:v1 .
+
+# create container using image
+docker run \ 
+    --name tracker-backend \ 
+    --network tracker-network \ 
+    -e DB_HOST=tracker-db \ 
+    -e DB_PORT=5432 \ 
+    -e DB_USER=postgres \ 
+    -e DB_PASSWORD=password \ 
+    -e DB_NAME=grades_db \ 
+    -d tracker-backend:v1
+```
+
+#### 3.3. Running the frontend container
+```
+# navigate to the frontend directory
+cd ../frontend
+
+# build image from Dockerfile
+docker build -t tracker-frontend:v1 .
+
+# create container using image
+docker run \ 
+    -p 80:80 \ 
+    --name tracker-frontend \ 
+    --network tracker-network \ 
+    -d tracker-frontend:v1
+```
+
+You can now access the site on your browser via **`http://localhost`**
+#### 3.4. Running with Docker Compose
+```
+```
+
+## Lessons Learned
+- Containers should communicate using Docker network hostnames, not localhost.
+- Port mappings expose services to the host; they are not used for communication between containers.
+- Nginx reverse proxy should forward requests to the backend service name.
+- The trailing slash in proxy_pass affects how request URIs are forwarded.
