@@ -223,8 +223,10 @@ Give the app time to start up, then access it through **`http://localhost`**
 
 When you are ready to take the app down, run the following:
 ```
-docker compose down -v
+docker compose down
 ```
+
+**Note:** because of data persistence, any changes made to the database will persist when you restart the application. If you wish to completely wipe out the changes you made, run `docker compose down -v`.
 
 ## Lessons Learned
 - Containers should communicate using Docker network hostnames, not localhost.
