@@ -132,13 +132,17 @@ sudo ln -s /etc/nginx/sites-available/grades-tracker /etc/nginx/sites-enabled/
 Add the following to `/etc/nginx/sites-available/grades-tracker`:
 ```
 server {
-        listen 80;
-        server_name localhost;
+    listen 80;
+    server_name localhost;
 
-        location / {
-                root /var/www/grades-tracker;
-                index index.html;
-        }
+    location / {
+        root /var/www/grades-tracker;
+        index index.html;
+    }
+
+    location /api/ {
+        proxy_pass http://localhost:3000;
+    }
 }
 ```
 
