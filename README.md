@@ -19,7 +19,10 @@ After completing this project, I will be able to demonstrate how to:
 * **Backend:** Node.js API (port 3000)
 * **Database:** PostgreSQL (port 5432)
 
-## System Architecture*
+## System Architecture
+![](https://github.com/KarenNgugi/CNE01-Independent_Project_2/blob/main/docs/ip2%20architecture.png)
+
+Full details of the architecture can be found [here](https://github.com/KarenNgugi/CNE01-Independent_Project_2/blob/main/docs/architecture.md).
 
 ## Project Structure*
 * **`backend/:`**
