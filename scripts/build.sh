@@ -4,6 +4,10 @@
 # make pipeline exit on failure
 set -euo pipefail
 
+# setting image names
+BACKEND_NAME="backend-image"
+FRONTEND_NAME="frontend-image"
+
 # no proceeding until exactly one argument is provided
 while [ $# -ne 1 ]
 do
@@ -17,45 +21,75 @@ do
 done
 
 BUILD_TAG=$1
-echo "Setting tag: $BUILD_TAG"
+printf "Setting tag: $BUILD_TAG\n\n"
 
 # check if Docker is installed, exit if it's not
+printf "\nChecking if Docker \U0001F40B is installed...\n"
 if command -v docker &> /dev/null; then
 	DOCKER_VERSION=$(docker --version | awk '{print $3}')
-	printf "\U0001F40B Docker version $DOCKER_VERSION detected! \U0002705\n"
+	printf "\U0001F40B Docker version $DOCKER_VERSION detected! \U0002705\n\n"
 else
 	printf "\U0001F40B Docker is not installed! \U000274C\n"
-	printf "Please install Docker at https://www.docker.com/get-started/ then try again.\n"
+	printf "Please install Docker at https://www.docker.com/get-started/ then try again.\n\n"
 	echo "Exiting with code 1."
 	exit 1
 fi
 
-# setting image names
-BACKEND_NAME="backend-image"
-FRONTEND_NAME="frontend-image"
-
-# starting from scripts/ 
-cd "$(dirname "$0")"
+# starting from root project dir 
+cd "$(dirname "$0")/.."
+printf "Setting initial working directory to: $(pwd)\n"
 
 # moving to backend/ and initiating build process
-cd "../backend"
-printf "\nNow building the backend image with build tag $BUILD_TAG. Please wait...\U00023F3\n"
-docker build -t "$BACKEND_NAME:$BUILD_TAG" .
+cd "backend"
+printf "\nSwitching to directory: $(pwd)\n"
+printf "\nBuilding backend '$BACKEND_NAME' with tag $BUILD_TAG. Please wait...\U00023F3\n\n"
+docker build --no-cache -t "$BACKEND_NAME:$BUILD_TAG" .
 if [ $? -eq 0 ]; then
-	printf "Image $BACKEND_NAME:$BUILD_TAG successfully built! \U0001F973\n\n"
+	printf "\nImage $BACKEND_NAME:$BUILD_TAG successfully built! \U0001F973\n\n"
 else
-	printf "Something went wrong! Aborting with exit code 1! \U00026D4\n\n"
+	printf "\nSomething went wrong while attempting to build image '$BACKEND_NAME:$BUILD_TAG'! Aborting with exit code 1! \U00026D4\n\n"
 	exit 1
 fi
 
 # moving to frontend/ and initiating build process
 cd "../frontend"
-printf "\nNow building the frontend image with build tag $BUILD_TAG. Please wait...\U00023F3\n"
-docker build -t "$FRONTEND_NAME:$BUILD_TAG" .
+printf "\nSwitching to directory: $(pwd)\n"
+printf "\nBuilding frontend '$FRONTEND_NAME' with tag $BUILD_TAG. Please wait...\U00023F3\n\n"
+docker build --no-cache -t "$FRONTEND_NAME:$BUILD_TAG" .
 if [ $? -eq 0 ]; then
-	printf "Image $FRONTEND_NAME:$BUILD_TAG successfully built! \U0001F973\n\n"
+	printf "\nImage $FRONTEND_NAME:$BUILD_TAG successfully built! \U0001F973\n\n"
 else
-	printf "Something went wrong! Aborting with exit code 1! \U00026D4\n\n"
+	printf "\nSomething went wrong while attempting to build image '$FRONTEND_NAME:$BUILD_TAG'! Aborting with exit code 1! \U00026D4\n\n"
 	exit 1
 fi
 
+# finishing up
+printf "You are all set! \U0001F44B\n"
+echo "To start the application, do the following:"
+
+# instruction to create docker network
+printf "\t1. Create a Docker network. Run:\n"
+printf "\t\tdocker network create tracker-network\n"
+
+# instruction to start database container
+printf "\t2. Start the PostgreSQL \U0001F418 database. Run:\n"
+printf "\t\tdocker run \n\t\t\t--name tracker-db \n\t\t\t-e POSTGRES_USER=postgres \n\t\t\t-e POSTGRES_PASSWORD=password \n\t\t\t-e POSTGRES_DB=grades_db \n\t\t\t--network tracker-network \n\t\t\t-v ./init.sql:/docker-entrypoint-initdb.d/init.sql \n\t\t\t-d postgres:17\n "
+
+# instruction to start backend container
+printf "\t2. Start the NodeJS \U0001F9DF backend. Run:\n"
+printf "\t\tdocker run \n\t\t\t--name tracker-backend \n\t\t\t--network tracker-network \n\t\t\t-e DB_HOST=tracker-db \n\t\t\t-e DB_PORT=5432 \n\t\t\t-e DB_USER=postgres \n\t\t\t-e DB_PASSWORD=password \n\t\t\t-e DB_NAME=grades_db \n\t\t\t-d $BACKEND_NAME:$BUILD_TAG\n"
+
+# instruction to start frontend container
+printf "\t3. Start the Nginx \U0001F4BB frontend. Run:\n"
+printf "\t\tdocker run \n\t\t\t-p 80:80 \n\t\t\t--name tracker-frontend \n\t\t\t--network tracker-network \n\t\t\t-d $FRONTEND_NAME:$BUILD_TAG\n"
+
+# instructions to stop & remove containers
+printf "\nWhen you are done, run the following commands to stop and remove the containers:\n"
+printf "\tdocker stop tracker-frontend tracker-backend tracker-db\n"
+printf "\tdocker rm tracker-frontend tracker-backend tracker-db\n"
+
+# instruction to remove images
+printf "\nTo remove the images, run:\n"
+printf "\tdocker image rm $BACKEND_NAME:$BUILD_TAG $FRONTEND_NAME:$BUILD_TAG\n"
+
+printf "\nGoodbye! \U0001F44B\n"
