@@ -101,13 +101,14 @@ When successful, you will see this output:
 Database connection established
 Grade Tracker API running on port 3000
 ```
+Don't stop the service or close the current terminal.
 
 The following endpoints can be accessed:
 * **`/api/students:`** returns JSON of current students in the database
 * **`/api/grades:`** returns JSON of grades per students
 
 #### 2.3. Nginx (frontend)
-Before starting on Nginx, first confirm the initial set up is ok:
+Open a new terminal. Before starting on Nginx, first confirm the initial set up is ok:
 ```
 sudo nginx -t
 ```
