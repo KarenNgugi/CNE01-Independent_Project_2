@@ -18,3 +18,14 @@ done
 
 BUILD_TAG=$1
 echo "Setting tag: $BUILD_TAG"
+
+# check if Docker is installed, exit if it's not
+if command -v docker &> /dev/null; then
+	DOCKER_VERSION=$(docker --version | awk '{print $3}')
+	printf "\U0001F40B Docker version $DOCKER_VERSION detected! \U0002705\n"
+else
+	printf "\U0001F40B Docker is not installed! \U000274C\n"
+	printf "Please install Docker at https://www.docker.com/get-started/ then try again.\n"
+	echo "Exiting with code 1."
+	exit 1
+fi
