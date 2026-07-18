@@ -29,3 +29,33 @@ else
 	echo "Exiting with code 1."
 	exit 1
 fi
+
+# setting image names
+BACKEND_NAME="backend-image"
+FRONTEND_NAME="frontend-image"
+
+# starting from scripts/ 
+cd "$(dirname "$0")"
+
+# moving to backend/ and initiating build process
+cd "../backend"
+printf "\nNow building the backend image with build tag $BUILD_TAG. Please wait...\U00023F3\n"
+docker build -t "$BACKEND_NAME:$BUILD_TAG" .
+if [ $? -eq 0 ]; then
+	printf "Image $BACKEND_NAME:$BUILD_TAG successfully built! \U0001F973\n\n"
+else
+	printf "Something went wrong! Aborting with exit code 1! \U00026D4\n\n"
+	exit 1
+fi
+
+# moving to frontend/ and initiating build process
+cd "../frontend"
+printf "\nNow building the frontend image with build tag $BUILD_TAG. Please wait...\U00023F3\n"
+docker build -t "$FRONTEND_NAME:$BUILD_TAG" .
+if [ $? -eq 0 ]; then
+	printf "Image $FRONTEND_NAME:$BUILD_TAG successfully built! \U0001F973\n\n"
+else
+	printf "Something went wrong! Aborting with exit code 1! \U00026D4\n\n"
+	exit 1
+fi
+
