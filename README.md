@@ -237,3 +237,6 @@ docker compose down
 - Port mappings expose services to the host; they are not used for communication between containers.
 - Nginx reverse proxy should forward requests to the backend service name.
 - The trailing slash in proxy_pass affects how request URIs are forwarded.
+
+## Author Information
+Contributor: [Karen Ngugi](https://github.com/KarenNgugi)
