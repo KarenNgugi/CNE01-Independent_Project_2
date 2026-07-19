@@ -37,6 +37,15 @@ else
       
 			if [ "$(docker inspect -f '{{ .State.Health.Status }}' $BACKEND_CONTAINER)" = "healthy" ]; then
 				echo "Container '$BACKEND_CONTAINER' is healthy!"
+				
+				# check the health endpoint
+				if [ "$(docker exec tracker-backend2 wget -qO- http://127.0.0.1:3000/health | jq -r '.status')" = "OK" ]; then
+					echo "Backend healthcheck endpoint confirmed OK."
+				else 
+					echo "Backend healthcheck endpoint not confirmed OK. Exiting with code 1."
+					printf "Backend healthcheck status: FAIL \U000274C\n"
+					exit 1
+				fi
         
 			elif [ "$(docker inspect -f '{{ .State.Health.Status }}' $BACKEND_CONTAINER)" = "unhealthy" ]; then
 				printf "Container '$BACKEND_CONTAINER' is unhealthy!\nLast error log:\n"
